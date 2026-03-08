@@ -3,96 +3,243 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GitHub Pages Browser — toviksiton</title>
+  <title>GitHub Pages — toviksiton</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0d1117;
-      --surface: #161b22;
-      --border: #30363d;
-      --accent: #238636;
-      --accent-hover: #2ea043;
-      --blue: #58a6ff;
-      --text: #e6edf3;
-      --muted: #8b949e;
-      --radius: 10px;
+      --bg: #ebebeb;
+      --surface: #ffffff;
+      --text: #111111;
+      --muted: #777777;
+      --border: #d8d8d8;
+      --purple: #6c2eff;
+      --purple-hover: #5520d4;
+      --red: #ff2d5b;
+      --cyan: #00c2ff;
+      --magenta: #e800c8;
+      --radius: 14px;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
     }
 
-    /* ── Header ─────────────────────────────────────── */
+    /* ── Decorative shapes ─────────────────────────────── */
+    .shape {
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
     header {
       background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
+      border-bottom: 1.5px solid var(--border);
+      padding: 0 40px;
+      height: 64px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 40px;
       position: sticky;
       top: 0;
       z-index: 100;
     }
 
-    header svg { flex-shrink: 0; }
+    .brand {
+      font-weight: 900;
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+    }
 
-    .header-title { font-size: 1.15rem; font-weight: 600; }
-    .header-subtitle { font-size: 0.8rem; color: var(--muted); }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+    }
+    .nav-links a {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.18s;
+    }
+    .nav-links a:hover { color: var(--text); }
 
     .spacer { flex: 1; }
 
     #search-input {
       background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
       color: var(--text);
-      font-size: 0.88rem;
-      padding: 6px 12px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      padding: 7px 18px;
       width: 220px;
       outline: none;
       transition: border-color 0.2s;
     }
-    #search-input:focus { border-color: var(--blue); }
+    #search-input:focus { border-color: var(--purple); }
     #search-input::placeholder { color: var(--muted); }
 
-    /* ── Toolbar ─────────────────────────────────────── */
-    .toolbar {
-      padding: 14px 24px;
+    #token-btn {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-family: inherit;
+      font-weight: 500;
+      padding: 6px 16px;
+      transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    #token-btn:hover { border-color: var(--purple); color: var(--purple); }
+
+    /* ── Hero ────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 72px 40px 56px;
+      border-bottom: 1.5px solid var(--border);
+      background: var(--surface);
+    }
+
+    /* geometric decorations */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: 120px;
+      width: 120px; height: 120px;
+      border: 14px solid var(--red);
+      border-radius: 50%;
+      opacity: .18;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; right: 60px;
+      width: 90px; height: 90px;
+      background: var(--cyan);
+      border-radius: 50%;
+      opacity: .22;
+    }
+
+    .hero-x {
+      position: absolute;
+      top: 28px; right: 240px;
+      font-size: 5rem;
+      font-weight: 900;
+      color: var(--text);
+      opacity: .07;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .hero-triangle {
+      position: absolute;
+      bottom: 20px; right: 180px;
+      width: 0; height: 0;
+      border-left: 22px solid transparent;
+      border-right: 22px solid transparent;
+      border-bottom: 38px solid var(--magenta);
+      opacity: .25;
+    }
+
+    .dots-grid {
+      position: absolute;
+      bottom: 24px; left: 40px;
+      display: grid;
+      grid-template-columns: repeat(8, 8px);
+      gap: 8px;
+      opacity: .2;
+    }
+    .dots-grid span {
+      width: 4px; height: 4px;
+      background: var(--muted);
+      border-radius: 50%;
+      display: block;
+    }
+
+    .hero-title {
+      font-size: clamp(2.6rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      max-width: 680px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title span {
+      color: var(--purple);
+    }
+
+    .hero-sub {
+      margin-top: 18px;
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 440px;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 20px;
+      margin-top: 28px;
+      position: relative;
+      z-index: 1;
       flex-wrap: wrap;
     }
 
     #status {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       color: var(--muted);
+      padding: 8px 0;
     }
 
-    #token-btn {
-      margin-left: auto;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      transition: border-color 0.2s, color 0.2s;
+    .pill-accent {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--purple);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 9px 22px;
+      border-radius: 100px;
+      border: none;
+      cursor: default;
     }
-    #token-btn:hover { border-color: var(--blue); color: var(--blue); }
 
-    /* ── Token modal ─────────────────────────────────── */
+    /* ── Token Modal ─────────────────────────────────────── */
     #modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.6);
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(4px);
       z-index: 200;
       align-items: center;
       justify-content: center;
@@ -101,75 +248,81 @@
 
     #modal {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px 28px 22px;
-      width: min(420px, 90vw);
+      padding: 32px;
+      width: min(440px, 90vw);
+      box-shadow: 0 20px 60px rgba(0,0,0,.12);
     }
-    #modal h2 { font-size: 1rem; margin-bottom: 8px; }
-    #modal p  { font-size: 0.82rem; color: var(--muted); margin-bottom: 16px; line-height: 1.55; }
+    #modal h2 { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 10px; }
+    #modal p  { font-size: 0.82rem; color: var(--muted); margin-bottom: 18px; line-height: 1.6; }
     #modal input {
       width: 100%;
       background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
       color: var(--text);
       font-size: 0.88rem;
-      padding: 8px 12px;
+      font-family: inherit;
+      padding: 10px 14px;
       outline: none;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
-    #modal input:focus { border-color: var(--blue); }
+    #modal input:focus { border-color: var(--purple); }
     .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
     .modal-actions button {
-      border-radius: 6px;
+      border-radius: 100px;
       border: none;
       cursor: pointer;
-      font-size: 0.88rem;
-      padding: 7px 16px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      font-weight: 700;
+      padding: 9px 22px;
+      transition: opacity 0.18s;
     }
-    #modal-cancel { background: var(--border); color: var(--text); }
-    #modal-save   { background: var(--accent); color: #fff; }
-    #modal-save:hover { background: var(--accent-hover); }
+    .modal-actions button:hover { opacity: .8; }
+    #modal-cancel { background: var(--bg); color: var(--muted); }
+    #modal-save   { background: var(--purple); color: #fff; }
 
-    /* ── Grid ────────────────────────────────────────── */
+    /* ── Grid ────────────────────────────────────────────── */
     #grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-      padding: 0 24px 32px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      padding: 36px 40px 60px;
     }
 
-    /* ── Card ────────────────────────────────────────── */
+    /* ── Card ────────────────────────────────────────────── */
     .card {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius);
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transition: border-color 0.2s, transform 0.15s;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.18s;
     }
-    .card:hover { border-color: var(--blue); transform: translateY(-2px); }
-
-    .card-preview {
-      width: 100%;
-      height: 160px;
-      border: none;
-      background: #fff;
-      pointer-events: none;
-      display: block;
-      transform-origin: top left;
+    .card:hover {
+      border-color: var(--purple);
+      box-shadow: 0 8px 32px rgba(108,46,255,.10);
+      transform: translateY(-3px);
     }
 
-    /* iframe scaled to fit */
     .preview-wrap {
       width: 100%;
-      height: 160px;
+      height: 180px;
       overflow: hidden;
       position: relative;
-      background: #fff;
+      background: var(--bg);
       cursor: pointer;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .preview-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,.04) 100%);
+      pointer-events: none;
     }
     .preview-wrap iframe {
       width: 200%;
@@ -181,20 +334,20 @@
     }
     .preview-placeholder {
       width: 100%;
-      height: 160px;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #1c2128;
+      background: var(--bg);
       color: var(--muted);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
-    .preview-placeholder svg { opacity: .4; }
+    .preview-placeholder svg { opacity: .3; }
 
     .card-body {
-      padding: 14px 16px;
+      padding: 18px 20px 14px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -202,20 +355,22 @@
     }
 
     .card-name {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--blue);
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+      color: var(--text);
       text-decoration: none;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      transition: color 0.18s;
     }
-    .card-name:hover { text-decoration: underline; }
+    .card-name:hover { color: var(--purple); }
 
     .card-desc {
       font-size: 0.8rem;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.55;
       flex: 1;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -226,67 +381,76 @@
     .card-footer {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-top: 8px;
+      gap: 8px;
+      margin-top: 10px;
       flex-wrap: wrap;
     }
 
     .badge {
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 20px;
-      border: 1px solid;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
     }
-    .badge-green  { border-color: var(--accent); color: var(--accent-hover); }
-    .badge-lang   { border-color: var(--border); color: var(--muted); }
+    .badge-green  { background: #e6f4ea; color: #1a7a36; }
+    .badge-lang   { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
 
     .stars {
-      font-size: 0.75rem;
+      font-size: 0.73rem;
+      font-weight: 600;
       color: var(--muted);
       margin-left: auto;
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
     }
 
     .open-btn {
-      display: block;
-      text-align: center;
-      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--text);
       color: #fff;
-      border-radius: 6px;
-      padding: 7px;
+      border-radius: 0 0 calc(var(--radius) - 1.5px) calc(var(--radius) - 1.5px);
+      padding: 11px;
       font-size: 0.82rem;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       text-decoration: none;
-      margin: 0 16px 14px;
-      transition: background 0.2s;
+      transition: background 0.18s;
     }
-    .open-btn:hover { background: var(--accent-hover); }
+    .open-btn:hover { background: var(--purple); }
 
-    /* ── States ──────────────────────────────────────── */
+    /* ── States ──────────────────────────────────────────── */
     #loading, #empty {
       text-align: center;
-      padding: 60px 24px;
+      padding: 80px 24px;
       color: var(--muted);
       font-size: 0.9rem;
       grid-column: 1 / -1;
     }
 
     .spinner {
-      width: 32px; height: 32px;
+      width: 36px; height: 36px;
       border: 3px solid var(--border);
-      border-top-color: var(--blue);
+      border-top-color: var(--purple);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
-      margin: 0 auto 16px;
+      margin: 0 auto 20px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Responsive ──────────────────────────────────── */
-    @media (max-width: 500px) {
-      header { flex-wrap: wrap; }
-      #search-input { width: 100%; }
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 640px) {
+      header { padding: 0 20px; gap: 16px; }
+      .nav-links { display: none; }
+      #search-input { width: 140px; }
+      .hero { padding: 48px 20px 40px; }
+      #grid { padding: 24px 20px 48px; gap: 16px; }
     }
   </style>
 </head>
@@ -294,23 +458,33 @@
 
 <!-- ── Header ──────────────────────────────────────────── -->
 <header>
-  <!-- GitHub Octocat icon -->
-  <svg width="32" height="32" viewBox="0 0 98 96" fill="var(--text)" xmlns="http://www.w3.org/2000/svg">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/>
-  </svg>
-  <div>
-    <div class="header-title">GitHub Pages Browser</div>
-    <div class="header-subtitle" id="username-label">toviksiton</div>
-  </div>
+  <span class="brand">toviksiton</span>
+  <nav class="nav-links">
+    <a href="https://github.com/toviksiton" target="_blank" rel="noopener">GitHub</a>
+    <a href="#" id="token-link">Token</a>
+  </nav>
   <div class="spacer"></div>
-  <input id="search-input" type="search" placeholder="Search repositories…" />
+  <input id="search-input" type="search" placeholder="Search repos…" />
+  <button id="token-btn">+ Token</button>
 </header>
 
-<!-- ── Toolbar ─────────────────────────────────────────── -->
-<div class="toolbar">
-  <span id="status">Loading repositories…</span>
-  <button id="token-btn" title="Add a GitHub token to increase the API rate limit">+ GitHub Token</button>
-</div>
+<!-- ── Hero ────────────────────────────────────────────── -->
+<section class="hero">
+  <!-- decorative elements -->
+  <div class="hero-x">×</div>
+  <div class="hero-triangle"></div>
+  <div class="dots-grid" id="dots-grid"></div>
+
+  <h1 class="hero-title">GitHub<br>Pages <span>Browser</span></h1>
+  <p class="hero-sub">All your published GitHub Pages sites in one place — with live previews.</p>
+  <div class="hero-row">
+    <div class="pill-accent">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="4"/></svg>
+      Live
+    </div>
+    <span id="status">Loading…</span>
+  </div>
+</section>
 
 <!-- ── Token Modal ─────────────────────────────────────── -->
 <div id="modal-overlay">
@@ -318,8 +492,8 @@
     <h2>GitHub Personal Access Token</h2>
     <p>
       The GitHub API allows 60 requests/hour without authentication.
-      Providing a token raises this to 5,000/hour and lets you browse private repositories.<br><br>
-      The token is stored only in <code>localStorage</code> and is never sent anywhere except GitHub's API.
+      A token raises this to 5,000/hour and allows private repo browsing.<br><br>
+      Stored only in <code>localStorage</code> — never sent anywhere except GitHub's API.
     </p>
     <input id="token-input" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
     <div class="modal-actions">
@@ -338,12 +512,20 @@
 </main>
 
 <script>
+  // ── Dots decoration ─────────────────────────────────────
+  const dotsGrid = document.getElementById('dots-grid');
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElement('span');
+    dotsGrid.appendChild(s);
+  }
+
   // ── Config ──────────────────────────────────────────────
   const USERNAME = 'toviksiton';
   const TOKEN_KEY = 'gh_pages_browser_token';
 
   // ── Token helpers ───────────────────────────────────────
   const tokenBtn     = document.getElementById('token-btn');
+  const tokenLink    = document.getElementById('token-link');
   const modalOverlay = document.getElementById('modal-overlay');
   const tokenInput   = document.getElementById('token-input');
   const modalCancel  = document.getElementById('modal-cancel');
@@ -351,10 +533,13 @@
 
   function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
 
-  tokenBtn.addEventListener('click', () => {
+  function openModal() {
     tokenInput.value = getToken();
     modalOverlay.classList.add('open');
-  });
+  }
+
+  tokenBtn.addEventListener('click', openModal);
+  tokenLink.addEventListener('click', e => { e.preventDefault(); openModal(); });
   modalCancel.addEventListener('click', () => modalOverlay.classList.remove('open'));
   modalSave.addEventListener('click', () => {
     const v = tokenInput.value.trim();
@@ -392,7 +577,6 @@
 
   // ── Rendering ───────────────────────────────────────────
   function pagesUrl(repo) {
-    // username.github.io repo → root pages URL
     if (repo.name.toLowerCase() === `${USERNAME.toLowerCase()}.github.io`) {
       return `https://${USERNAME}.github.io/`;
     }
@@ -400,13 +584,13 @@
   }
 
   function starIcon() {
-    return `<svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+    return `<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
       <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
     </svg>`;
   }
 
   function globeIcon() {
-    return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    return `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
       <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
     </svg>`;
@@ -421,11 +605,9 @@
     card.dataset.name = repo.name.toLowerCase();
     card.dataset.desc = (repo.description || '').toLowerCase();
 
-    // Preview area — try iframe, fall back gracefully
     const previewWrap = document.createElement('div');
     previewWrap.className = 'preview-wrap';
     previewWrap.title = 'Click to open';
-    previewWrap.style.cursor = 'pointer';
     previewWrap.addEventListener('click', () => window.open(url, '_blank'));
 
     const iframe = document.createElement('iframe');
@@ -433,10 +615,7 @@
     iframe.src = url;
     iframe.title = repo.name;
     iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
-
-    // If iframe fails (X-Frame-Options etc.) show placeholder
     iframe.addEventListener('error', () => showPlaceholder(previewWrap, url));
-    // Also show placeholder after a small delay if still blank (cross-origin check)
     previewWrap.appendChild(iframe);
 
     const body = document.createElement('div');
@@ -458,7 +637,7 @@
 
     const badgePages = document.createElement('span');
     badgePages.className = 'badge badge-green';
-    badgePages.textContent = 'GitHub Pages';
+    badgePages.textContent = 'Pages';
     footer.appendChild(badgePages);
 
     if (repo.language) {
@@ -480,7 +659,7 @@
     openBtn.href = url;
     openBtn.target = '_blank';
     openBtn.rel = 'noopener noreferrer';
-    openBtn.textContent = 'Open Page ↗';
+    openBtn.innerHTML = 'Open Site ↗';
 
     card.append(previewWrap, body, openBtn);
     return card;
@@ -490,8 +669,7 @@
     wrap.innerHTML = `
       <div class="preview-placeholder">
         ${globeIcon()}
-        <span>Preview unavailable</span>
-        <span style="font-size:0.7rem">(click to visit)</span>
+        <span>Preview unavailable — click to visit</span>
       </div>`;
     wrap.addEventListener('click', () => window.open(url, '_blank'));
   }
@@ -511,7 +689,7 @@
 
   function updateStatus(count) {
     document.getElementById('status').textContent =
-      `${count} GitHub Pages ${count === 1 ? 'site' : 'sites'} found`;
+      `${count} ${count === 1 ? 'site' : 'sites'} found`;
   }
 
   // ── Main load ───────────────────────────────────────────
@@ -529,8 +707,8 @@
       if (pageRepos.length === 0) {
         grid.innerHTML = `
           <div id="empty">
-            <p>No GitHub Pages found for <strong>${USERNAME}</strong>.</p>
-            <p style="margin-top:8px;font-size:0.8rem">
+            <p style="font-weight:700;font-size:1.1rem">No GitHub Pages found for <strong>${USERNAME}</strong>.</p>
+            <p style="margin-top:10px;font-size:0.82rem">
               Make sure your repos have GitHub Pages enabled in their settings.
             </p>
           </div>`;
@@ -548,8 +726,8 @@
     } catch (err) {
       grid.innerHTML = `
         <div id="empty">
-          <p style="color:#f85149">Error: ${err.message}</p>
-          <p style="margin-top:8px;font-size:0.8rem">
+          <p style="color:#ff2d5b;font-weight:700">Error: ${err.message}</p>
+          <p style="margin-top:10px;font-size:0.82rem">
             You may have hit the API rate limit. Add a GitHub token to continue.
           </p>
         </div>`;

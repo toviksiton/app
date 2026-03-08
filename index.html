@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitHub Pages Browser — toviksiton</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --accent: #238636;
+      --accent-hover: #2ea043;
+      --blue: #58a6ff;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --radius: 10px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header svg { flex-shrink: 0; }
+
+    .header-title { font-size: 1.15rem; font-weight: 600; }
+    .header-subtitle { font-size: 0.8rem; color: var(--muted); }
+
+    .spacer { flex: 1; }
+
+    #search-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.88rem;
+      padding: 6px 12px;
+      width: 220px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #search-input:focus { border-color: var(--blue); }
+    #search-input::placeholder { color: var(--muted); }
+
+    /* ── Toolbar ─────────────────────────────────────── */
+    .toolbar {
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #status {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    #token-btn {
+      margin-left: auto;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    #token-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* ── Token modal ─────────────────────────────────── */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #modal-overlay.open { display: flex; }
+
+    #modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 28px 22px;
+      width: min(420px, 90vw);
+    }
+    #modal h2 { font-size: 1rem; margin-bottom: 8px; }
+    #modal p  { font-size: 0.82rem; color: var(--muted); margin-bottom: 16px; line-height: 1.55; }
+    #modal input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.88rem;
+      padding: 8px 12px;
+      outline: none;
+      margin-bottom: 14px;
+    }
+    #modal input:focus { border-color: var(--blue); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-actions button {
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.88rem;
+      padding: 7px 16px;
+    }
+    #modal-cancel { background: var(--border); color: var(--text); }
+    #modal-save   { background: var(--accent); color: #fff; }
+    #modal-save:hover { background: var(--accent-hover); }
+
+    /* ── Grid ────────────────────────────────────────── */
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      padding: 0 24px 32px;
+    }
+
+    /* ── Card ────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .card:hover { border-color: var(--blue); transform: translateY(-2px); }
+
+    .card-preview {
+      width: 100%;
+      height: 160px;
+      border: none;
+      background: #fff;
+      pointer-events: none;
+      display: block;
+      transform-origin: top left;
+    }
+
+    /* iframe scaled to fit */
+    .preview-wrap {
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      position: relative;
+      background: #fff;
+      cursor: pointer;
+    }
+    .preview-wrap iframe {
+      width: 200%;
+      height: 200%;
+      transform: scale(0.5);
+      transform-origin: top left;
+      pointer-events: none;
+      border: none;
+    }
+    .preview-placeholder {
+      width: 100%;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1c2128;
+      color: var(--muted);
+      font-size: 0.8rem;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .preview-placeholder svg { opacity: .4; }
+
+    .card-body {
+      padding: 14px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--blue);
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-name:hover { text-decoration: underline; }
+
+    .card-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid;
+    }
+    .badge-green  { border-color: var(--accent); color: var(--accent-hover); }
+    .badge-lang   { border-color: var(--border); color: var(--muted); }
+
+    .stars {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .open-btn {
+      display: block;
+      text-align: center;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 6px;
+      padding: 7px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      margin: 0 16px 14px;
+      transition: background 0.2s;
+    }
+    .open-btn:hover { background: var(--accent-hover); }
+
+    /* ── States ──────────────────────────────────────── */
+    #loading, #empty {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      grid-column: 1 / -1;
+    }
+
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ──────────────────────────────────── */
+    @media (max-width: 500px) {
+      header { flex-wrap: wrap; }
+      #search-input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────── -->
+<header>
+  <!-- GitHub Octocat icon -->
+  <svg width="32" height="32" viewBox="0 0 98 96" fill="var(--text)" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/>
+  </svg>
+  <div>
+    <div class="header-title">GitHub Pages Browser</div>
+    <div class="header-subtitle" id="username-label">toviksiton</div>
+  </div>
+  <div class="spacer"></div>
+  <input id="search-input" type="search" placeholder="Search repositories…" />
+</header>
+
+<!-- ── Toolbar ─────────────────────────────────────────── -->
+<div class="toolbar">
+  <span id="status">Loading repositories…</span>
+  <button id="token-btn" title="Add a GitHub token to increase the API rate limit">+ GitHub Token</button>
+</div>
+
+<!-- ── Token Modal ─────────────────────────────────────── -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h2>GitHub Personal Access Token</h2>
+    <p>
+      The GitHub API allows 60 requests/hour without authentication.
+      Providing a token raises this to 5,000/hour and lets you browse private repositories.<br><br>
+      The token is stored only in <code>localStorage</code> and is never sent anywhere except GitHub's API.
+    </p>
+    <input id="token-input" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+    <div class="modal-actions">
+      <button id="modal-cancel">Cancel</button>
+      <button id="modal-save">Save & Reload</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Card Grid ───────────────────────────────────────── -->
+<main id="grid">
+  <div id="loading">
+    <div class="spinner"></div>
+    Fetching your GitHub Pages…
+  </div>
+</main>
+
+<script>
+  // ── Config ──────────────────────────────────────────────
+  const USERNAME = 'toviksiton';
+  const TOKEN_KEY = 'gh_pages_browser_token';
+
+  // ── Token helpers ───────────────────────────────────────
+  const tokenBtn     = document.getElementById('token-btn');
+  const modalOverlay = document.getElementById('modal-overlay');
+  const tokenInput   = document.getElementById('token-input');
+  const modalCancel  = document.getElementById('modal-cancel');
+  const modalSave    = document.getElementById('modal-save');
+
+  function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
+
+  tokenBtn.addEventListener('click', () => {
+    tokenInput.value = getToken();
+    modalOverlay.classList.add('open');
+  });
+  modalCancel.addEventListener('click', () => modalOverlay.classList.remove('open'));
+  modalSave.addEventListener('click', () => {
+    const v = tokenInput.value.trim();
+    if (v) localStorage.setItem(TOKEN_KEY, v);
+    else    localStorage.removeItem(TOKEN_KEY);
+    modalOverlay.classList.remove('open');
+    loadRepos();
+  });
+  modalOverlay.addEventListener('click', e => {
+    if (e.target === modalOverlay) modalOverlay.classList.remove('open');
+  });
+
+  // ── GitHub API fetch ────────────────────────────────────
+  async function ghFetch(url) {
+    const headers = { Accept: 'application/vnd.github+json' };
+    const token = getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(url, { headers });
+    if (!res.ok) throw new Error(`GitHub API error ${res.status}: ${res.statusText}`);
+    return res.json();
+  }
+
+  async function getAllRepos() {
+    let page = 1, all = [];
+    while (true) {
+      const data = await ghFetch(
+        `https://api.github.com/users/${USERNAME}/repos?per_page=100&page=${page}&sort=pushed`
+      );
+      all = all.concat(data);
+      if (data.length < 100) break;
+      page++;
+    }
+    return all;
+  }
+
+  // ── Rendering ───────────────────────────────────────────
+  function pagesUrl(repo) {
+    // username.github.io repo → root pages URL
+    if (repo.name.toLowerCase() === `${USERNAME.toLowerCase()}.github.io`) {
+      return `https://${USERNAME}.github.io/`;
+    }
+    return `https://${USERNAME}.github.io/${repo.name}/`;
+  }
+
+  function starIcon() {
+    return `<svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
+    </svg>`;
+  }
+
+  function globeIcon() {
+    return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>`;
+  }
+
+  let allCards = [];
+
+  function buildCard(repo) {
+    const url = pagesUrl(repo);
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.dataset.name = repo.name.toLowerCase();
+    card.dataset.desc = (repo.description || '').toLowerCase();
+
+    // Preview area — try iframe, fall back gracefully
+    const previewWrap = document.createElement('div');
+    previewWrap.className = 'preview-wrap';
+    previewWrap.title = 'Click to open';
+    previewWrap.style.cursor = 'pointer';
+    previewWrap.addEventListener('click', () => window.open(url, '_blank'));
+
+    const iframe = document.createElement('iframe');
+    iframe.loading = 'lazy';
+    iframe.src = url;
+    iframe.title = repo.name;
+    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+
+    // If iframe fails (X-Frame-Options etc.) show placeholder
+    iframe.addEventListener('error', () => showPlaceholder(previewWrap, url));
+    // Also show placeholder after a small delay if still blank (cross-origin check)
+    previewWrap.appendChild(iframe);
+
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
+    const nameLink = document.createElement('a');
+    nameLink.className = 'card-name';
+    nameLink.href = `https://github.com/${USERNAME}/${repo.name}`;
+    nameLink.target = '_blank';
+    nameLink.rel = 'noopener noreferrer';
+    nameLink.textContent = repo.name;
+
+    const desc = document.createElement('p');
+    desc.className = 'card-desc';
+    desc.textContent = repo.description || 'No description provided.';
+
+    const footer = document.createElement('div');
+    footer.className = 'card-footer';
+
+    const badgePages = document.createElement('span');
+    badgePages.className = 'badge badge-green';
+    badgePages.textContent = 'GitHub Pages';
+    footer.appendChild(badgePages);
+
+    if (repo.language) {
+      const badgeLang = document.createElement('span');
+      badgeLang.className = 'badge badge-lang';
+      badgeLang.textContent = repo.language;
+      footer.appendChild(badgeLang);
+    }
+
+    const stars = document.createElement('span');
+    stars.className = 'stars';
+    stars.innerHTML = `${starIcon()} ${repo.stargazers_count.toLocaleString()}`;
+    footer.appendChild(stars);
+
+    body.append(nameLink, desc, footer);
+
+    const openBtn = document.createElement('a');
+    openBtn.className = 'open-btn';
+    openBtn.href = url;
+    openBtn.target = '_blank';
+    openBtn.rel = 'noopener noreferrer';
+    openBtn.textContent = 'Open Page ↗';
+
+    card.append(previewWrap, body, openBtn);
+    return card;
+  }
+
+  function showPlaceholder(wrap, url) {
+    wrap.innerHTML = `
+      <div class="preview-placeholder">
+        ${globeIcon()}
+        <span>Preview unavailable</span>
+        <span style="font-size:0.7rem">(click to visit)</span>
+      </div>`;
+    wrap.addEventListener('click', () => window.open(url, '_blank'));
+  }
+
+  // ── Search ──────────────────────────────────────────────
+  const searchInput = document.getElementById('search-input');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    let visible = 0;
+    allCards.forEach(c => {
+      const show = !q || c.dataset.name.includes(q) || c.dataset.desc.includes(q);
+      c.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    updateStatus(visible);
+  });
+
+  function updateStatus(count) {
+    document.getElementById('status').textContent =
+      `${count} GitHub Pages ${count === 1 ? 'site' : 'sites'} found`;
+  }
+
+  // ── Main load ───────────────────────────────────────────
+  async function loadRepos() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '<div id="loading"><div class="spinner"></div>Fetching your GitHub Pages…</div>';
+    allCards = [];
+
+    try {
+      const repos = await getAllRepos();
+      const pageRepos = repos.filter(r => r.has_pages);
+
+      grid.innerHTML = '';
+
+      if (pageRepos.length === 0) {
+        grid.innerHTML = `
+          <div id="empty">
+            <p>No GitHub Pages found for <strong>${USERNAME}</strong>.</p>
+            <p style="margin-top:8px;font-size:0.8rem">
+              Make sure your repos have GitHub Pages enabled in their settings.
+            </p>
+          </div>`;
+        updateStatus(0);
+        return;
+      }
+
+      pageRepos.forEach(repo => {
+        const card = buildCard(repo);
+        allCards.push(card);
+        grid.appendChild(card);
+      });
+
+      updateStatus(pageRepos.length);
+    } catch (err) {
+      grid.innerHTML = `
+        <div id="empty">
+          <p style="color:#f85149">Error: ${err.message}</p>
+          <p style="margin-top:8px;font-size:0.8rem">
+            You may have hit the API rate limit. Add a GitHub token to continue.
+          </p>
+        </div>`;
+      document.getElementById('status').textContent = 'Failed to load';
+    }
+  }
+
+  loadRepos();
+</script>
+</body>
+</html>
